@@ -4,8 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Counseling / Discipline Record</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root{
             --green-1: #28a745;        /* primary green */
@@ -725,100 +723,31 @@
         });
 
         // ==================== EMAIL TO HR FUNCTIONALITY ====================
-        async function emailToHR() {
+        function emailToHR() {
             // Get employee name for subject line
-            const employeeName = document.getElementById('empName').value || 'Unknown Employee';
+            const employeeName = document.getElementById('employeeName').value || 'Unknown Employee';
             const formTitle = 'Counseling / Discipline Record';
             const subject = `${employeeName} - ${formTitle}`;
             
             // Validate that employee name is filled
-            if (!document.getElementById('empName').value) {
+            if (!document.getElementById('employeeName').value) {
                 alert('Please enter the Employee Name before emailing to HR.');
                 return;
             }
 
-            try {
-                // Show loading message
-                const originalText = event.target.textContent;
-                event.target.textContent = 'Generating PDF...';
-                event.target.disabled = true;
+            // Create the email body
+            const body = `Please find attached the Counseling/Discipline Record for ${employeeName}.
 
-                // Get the form container
-                const formElement = document.querySelector('.container');
-                
-                // Use html2canvas to capture the form
-                const canvas = await html2canvas(formElement, {
-                    scale: 2,
-                    useCORS: true,
-                    logging: false,
-                    backgroundColor: '#ffffff'
-                });
+I will attach the PDF file to this email.`;
 
-                // Convert canvas to PDF using jsPDF
-                const imgData = canvas.toDataURL('image/png');
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'mm',
-                    format: 'a4'
-                });
-
-                const imgWidth = 210; // A4 width in mm
-                const pageHeight = 297; // A4 height in mm
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                let heightLeft = imgHeight;
-                let position = 0;
-
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-
-                while (heightLeft >= 0) {
-                    position = heightLeft - imgHeight;
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-                }
-
-                // Convert PDF to base64
-                const pdfBase64 = pdf.output('dataurlstring').split(',')[1];
-                
-                // Create filename
-                const filename = `${employeeName.replace(/[^a-z0-9]/gi, '_')}_${formTitle.replace(/[^a-z0-9]/gi, '_')}.pdf`;
-
-                // Prepare email data
-                const emailData = {
-                    to: 'hr@dossaniparadise.com',
-                    subject: subject,
-                    body: `Please find attached the ${formTitle} for ${employeeName}.`,
-                    attachment: pdfBase64,
-                    filename: filename
-                };
-
-                // Since we can't directly send emails from client-side JavaScript,
-                // we'll use a mailto link as a fallback
-                // For production, you'd need a backend service
-                
-                event.target.textContent = 'Opening Email...';
-                
-                // Create mailto link with attachment note
-                const mailtoLink = `mailto:hr@dossaniparadise.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('Please find the Counseling/Discipline Record form attached.\n\nNote: The PDF has been generated. Please attach it manually to this email or use the "Print / Save as PDF" button to save it first, then attach it to your email.')}`;
-                
-                window.location.href = mailtoLink;
-                
-                // Also download the PDF for the user to attach
-                pdf.save(filename);
-                
-                alert('The PDF has been downloaded to your computer. Please attach it to the email that just opened.');
-                
-                event.target.textContent = originalText;
-                event.target.disabled = false;
-
-            } catch (error) {
-                console.error('Error generating PDF:', error);
-                alert('There was an error generating the PDF. Please try using the "Print / Save as PDF" button instead.');
-                event.target.textContent = originalText;
-                event.target.disabled = false;
-            }
+            // Create mailto link
+            const mailtoLink = `mailto:hr@dossaniparadise.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            // Open email client
+            window.open(mailtoLink);
+            
+            // Show instruction to user
+            alert(`Email draft opened!\n\nNext steps:\n1. Use the "Print / Save as PDF" button to save the form\n2. Attach the PDF to the email that just opened\n3. Send the email to hr@dossaniparadise.com`);
         }
     </script>
 </body>
