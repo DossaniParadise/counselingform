@@ -286,18 +286,6 @@
             transform: translateY(-2px);
         }
 
-        .btn-email {
-            background-color: #007bff;
-            color: white;
-            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.35);
-        }
-
-        .btn-email:hover {
-            background-color: #0056b3;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.55);
-        }
-
         @media print {
             body {
                 background: white;
@@ -517,8 +505,7 @@
             </div>
 
             <div class="button-container">
-                <button type="button" class="btn-print" onclick="window.print()">Print / Save as PDF</button>
-                <button type="button" class="btn-email" onclick="emailToHR()">Email to HR</button>
+                <button type="button" class="btn-print" onclick="showHRReminder()">Print / Save as PDF</button>
                 <button type="button" class="btn-clear" onclick="clearForm()">Clear Form</button>
             </div>
         </form>
@@ -722,32 +709,13 @@
             }
         });
 
-        // ==================== EMAIL TO HR FUNCTIONALITY ====================
-        function emailToHR() {
-            // Get employee name for subject line
-            const employeeName = document.getElementById('employeeName').value || 'Unknown Employee';
-            const formTitle = 'Counseling / Discipline Record';
-            const subject = `${employeeName} - ${formTitle}`;
-            
-            // Validate that employee name is filled
-            if (!document.getElementById('employeeName').value) {
-                alert('Please enter the Employee Name before emailing to HR.');
-                return;
+        // ==================== HR REMINDER POPUP ====================
+        function showHRReminder() {
+            if (confirm("Don't forget to send a copy to hr@dossaniparadise.com !\n\nPress OK for 'Will Do' or Cancel for 'Never Mind'")) {
+                // User clicked "Will Do" (OK button)
+                window.print();
             }
-
-            // Create the email body
-            const body = `Please find attached the Counseling/Discipline Record for ${employeeName}.
-
-I will attach the PDF file to this email.`;
-
-            // Create mailto link
-            const mailtoLink = `mailto:hr@dossaniparadise.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            
-            // Open email client
-            window.open(mailtoLink);
-            
-            // Show instruction to user
-            alert(`Email draft opened!\n\nNext steps:\n1. Use the "Print / Save as PDF" button to save the form\n2. Attach the PDF to the email that just opened\n3. Send the email to hr@dossaniparadise.com`);
+            // If user clicked "Never Mind" (Cancel), do nothing
         }
     </script>
 </body>
