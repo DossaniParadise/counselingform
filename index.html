@@ -140,6 +140,10 @@
             transition: height 0.1s ease;
         }
 
+        .print-text {
+            display: none;
+        }
+
         textarea:focus {
             outline: none;
             border-color: var(--green-1);
@@ -455,8 +459,16 @@
             }
 
             textarea {
+                display: none;
+            }
+
+            .print-text {
+                display: block;
+                white-space: pre-wrap;
+                word-break: break-word;
                 border: 1px solid #000;
-                overflow: visible;
+                padding: 12px;
+                min-height: 80px;
             }
 
             .signature-display-box {
@@ -655,6 +667,7 @@
                 <div class="form-group">
                     <label for="violationSummary">Summary of Violation</label>
                     <textarea id="violationSummary" name="violationSummary" class="textarea-expanding" placeholder="Enter detailed description of the violation..."></textarea>
+                    <div class="print-text" data-for="violationSummary"></div>
                 </div>
             </div>
 
@@ -693,6 +706,7 @@
                 <div class="form-group">
                     <label for="correctiveAction">Summary of Corrective Action Plan. Include Actions and Dates for Improvement Follow Up:</label>
                     <textarea id="correctiveAction" name="correctiveAction" class="textarea-expanding" placeholder="Enter corrective action plan..."></textarea>
+                    <div class="print-text" data-for="correctiveAction"></div>
                 </div>
             </div>
 
@@ -705,6 +719,7 @@
                 <div class="form-group">
                     <label for="employeeComments">Employee Comments:</label>
                     <textarea id="employeeComments" name="employeeComments" class="textarea-expanding" placeholder="Employee may add comments here..."></textarea>
+                    <div class="print-text" data-for="employeeComments"></div>
                 </div>
             </div>
 
@@ -1067,10 +1082,21 @@
             }
         });
 
+        function syncPrintText() {
+            document.querySelectorAll('.print-text[data-for]').forEach(printBlock => {
+                const fieldId = printBlock.getAttribute('data-for');
+                const source = document.getElementById(fieldId);
+                printBlock.textContent = source ? source.value : '';
+            });
+        }
+
+        window.addEventListener('beforeprint', syncPrintText);
+
         // ==================== HR REMINDER POPUP ====================
         function showHRReminder() {
             if (confirm("Don't forget to send a copy to hr@dossaniparadise.com !\n\nPress OK for 'Will Do' or Cancel for 'Never Mind'")) {
                 // User clicked "Will Do" (OK button)
+                syncPrintText();
                 window.print();
             }
             // If user clicked "Never Mind" (Cancel), do nothing
